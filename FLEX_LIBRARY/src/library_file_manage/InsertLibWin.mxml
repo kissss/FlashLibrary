@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TitleWindow xmlns="flex.lml.Component.*" initialize="init()" showCloseButton="true" xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="448" height="410"
+			 xmlns:lml="flex.lml.Component.*" title="增加图书位置">
+
+	<mx:Script>
+		<![CDATA[
+			import flex.lml.utils.ValidateUtil;
+			import mx.collections.ArrayCollection;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			import flex.lml.utils.ValidateUtil;
+
+			[Bindable]
+			public var callBackFun:Function;
+
+			[Bindable]
+			private var bookLocationList:ArrayCollection;
+			[Bindable]
+			public var obj:Object;
+			[Bindable]
+			public var _list:ArrayCollection=new ArrayCollection;
+			public var index:int=0;
+
+			public var bookInfos:ArrayCollection; //一对多的 图书馆藏信息
+
+			private function init():void
+			{
+				httpBookLocation.send();
+				bookInfos=new ArrayCollection(obj.bookInfos as Array);
+				for (var i:int=0; i < bookInfos.length; i++)
+				{
+					var bookObj:Object=new Object;
+					bookObj["barcode"]=bookInfos[i].barcode;
+					bookObj["locationName"]=bookInfos[i].bookLocation_locationName;
+					bookObj["locationID"]=bookInfos[i].bookLocation_ID;
+					bookObj["bookInfoID"]=bookInfos[i].id;
+					bookObj["bookInfoStatus"]=bookInfos[i].status;
+					_list.addItem(bookObj);
+				}
+				buttonLabel();
+			}
+
+			private function buttonLabel():void
+			{
+				addButton.label="(" + _list.length + "/" + obj.booksCount + "),增加一行";
+			}
+
+
+			/**
+			 * 保存图书信息
+			 */
+			private function saveBookInfo():void
+			{
+				for (var i:int=0; i < _list.length; i++)
+				{
+					var param:Object=new Object;
+					if (_list[i].bookInfoID != null)
+					{
+						param["bookInfo.id"]=_list[i].bookInfoID;
+					}
+					param["bookInfo.isbn"]=obj.isbn;
+					param["bookInfo.barcode"]=_list[i].barcode;
+					param["bookInfo.status"]=_list[i].bookInfoStatus;
+					param["bookInfo.BookLocation_ID"]=_list[i].locationID;
+					param["bookInfo.bookData_ID"]=obj.id;
+					httpSaveBookInfo.send(param);
+				}
+			}
+
+			private function bookLocationHandler(evt:JsonResponseEvent):void
+			{
+				bookLocationList=new ArrayCollection(evt.JsonObj as Array);
+				for (var i:int=0; i < bookLocationList.length; i++)
+				{
+					if (bookLocationList[i].id == obj.bookInfo.bookLocation_ID)
+					{
+						bookLocation.selectedIndex=i;
+					}
+				}
+			}
+
+			private function saveBookInfoHandler(evt:JsonResponseEvent):void
+			{
+				index++;
+				var response:Object=evt.JsonObj;
+				if (response.success)
+				{
+					ExternalInterface.call("console.log", _list.length + "" + index);
+					if (_list.length == index)
+					{
+						close();
+						Alert.show(response.msg, "操作提示！");
+					}
+				}
+				else
+				{
+					Alert.show(response.msg, "操作提示！");
+				}
+			}
+
+			private function rowNum(item:Object, column:int):String
+			{
+				var index:int=this.dg.dataProvider.getItemIndex(item) + 1;
+				return String(index);
+			}
+
+			private function addBookLib():void
+			{
+				if (_list.length != obj.booksCount) //表示还可以添加 馆藏 否则表示 书的数量不够
+				{
+					if (ValidateUtil.valid(form))
+					{
+						var bookObj:Object=new Object;
+						bookObj["barcode"]=_barcode.text;
+						bookObj["locationName"]=bookLocation.selectedItem.locationName;
+						bookObj["locationID"]=bookLocation.selectedItem.id;
+						bookObj["bookInfoStatus"]=1;
+						_list.addItem(bookObj);
+						_barcode.text="";
+						buttonLabel();
+					}
+				}
+				else
+				{
+					Alert.show("已经没有书可以添加了", "提示");
+				}
+
+
+			}
+
+			private function reduceBookLib():void
+			{
+				for (var i:int=0; i < _list.length; i++)
+				{
+					if (dg.selectedItem.barcode == _list[i].barcode)
+					{
+						_list.removeItemAt(i);
+						break;
+					}
+				}
+				buttonLabel();
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="bookLocationHandler(event)" id="httpBookLocation" action="SystemManage/SystemManageAction!getBookLocationList"/>
+	<lml:CommonHttpService onJsonResponse="saveBookInfoHandler(event)" id="httpSaveBookInfo" action="FileManager/FileManagerAction!saveBookInfo"/>
+	<mx:Form id="form" width="100%" height="100%">
+		<mx:FormItem label="图书的ISBN号：" width="100%" required="true">
+			<lml:TextInput width="100%" text="{obj.isbn}" enabled="false"/>
+		</mx:FormItem>
+		<mx:FormItem label="图书条形码：" width="100%" required="true">
+			<lml:TextInput id="_barcode" format="图书条形码~!" width="100%" text="{obj.barcode}"/>
+		</mx:FormItem>
+		<mx:FormItem label="位置：" width="100%" required="true">
+			<mx:ComboBox id="bookLocation" dataProvider="{bookLocationList}" labelField="locationName"/>
+		</mx:FormItem>
+		<mx:HBox horizontalAlign="center" width="100%">
+			<mx:Button label="增加一项" id="addButton" styleName="add" click="addBookLib()"/>
+			<mx:Button label="删除一项" styleName="reduce" click="reduceBookLib()"/>
+		</mx:HBox>
+	</mx:Form>
+
+	<lml:CommonGrid id="dg" width="100%" height="100%" dataProvider="{_list}">
+		<lml:columns>
+			<mx:DataGridColumn headerText="序号" width="35" labelFunction="rowNum"/>
+			<mx:DataGridColumn headerText="图书条形码" dataField="barcode"/>
+			<mx:DataGridColumn headerText="图书馆藏位置" width="230" dataField="locationName"/>
+		</lml:columns>
+	</lml:CommonGrid>
+
+	<mx:ControlBar height="30" y="354" paddingTop="0" paddingLeft="0" horizontalAlign="center">
+		<mx:Button label="保存" styleName="save" click="saveBookInfo()"/>
+		<mx:Button label="取消" styleName="cancel" click="close()"/>
+	</mx:ControlBar>
+</TitleWindow>

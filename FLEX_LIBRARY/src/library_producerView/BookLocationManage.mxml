@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" width="100%" fontSize="12" height="100%" xmlns:lml="flex.lml.Component.*">
+	<mx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			import flex.lml.Connection.JsonResponseEvent;
+			import flex.lml.Component.FileDownload;
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.core.Application;
+			import flash.external.ExternalInterface;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var _js:Object;
+			[Bindable]
+			public var isSubmit:Boolean;
+
+			private function init():void
+			{
+			}
+
+			private function linkButton_WXL(event:MouseEvent):void
+			{
+				navigateToURL(new URLRequest("http://weibo.com/u/1352357355?wvr=5&lf=reg"), "_blank");
+			}
+
+			private function linkButton_TY(event:MouseEvent):void
+			{
+				navigateToURL(new URLRequest("http://weibo.com/tang7yu?source=webim"), "_blank");
+			}
+
+			private function linkButton_CJ(event:MouseEvent):void
+			{
+				navigateToURL(new URLRequest("http://weibo.com/u/2140653230?source=webim"), "_blank");
+			}
+
+			private function linkButton_ZJ(event:MouseEvent):void
+			{
+				navigateToURL(new URLRequest("http://www.baidu.com"), "_blank");
+			}
+		]]>
+	</mx:Script>
+
+	<mx:Panel width="100%" height="100%" layout="vertical" title="制作人员" titleIcon="@Embed(source='images/book_edit.png')">
+		<mx:VBox width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+			<mx:LinkButton label="10级软件工程一班-王筱磊  学号:201013014078" click="linkButton_WXL(event)"/>
+			<mx:LinkButton label="10级软件工程一班-唐   雨  学号:201013014083" click="linkButton_TY(event)"/>
+			<mx:LinkButton label="10级软件工程三班-陈  静 学号:201013019007" click="linkButton_CJ(event)"/>
+			<mx:LinkButton label="10级软件工程三班-邹  俊 学号:201013019008" click="linkButton_WXL(event)"/>
+
+
+		</mx:VBox>
+	</mx:Panel>
+</mx:Module>

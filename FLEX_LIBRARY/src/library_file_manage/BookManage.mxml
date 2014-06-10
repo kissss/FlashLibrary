@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" width="100%" fontSize="12" height="100%" xmlns:lml="flex.lml.Component.*">
+	<mx:Script>
+		<![CDATA[
+			import flex.lml.Connection.JsonResponseEvent;
+			import flex.lml.Component.FileDownload;
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.core.Application;
+			import flash.external.ExternalInterface;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var _js:Object;
+			[Bindable]
+			public var isSubmit:Boolean;
+
+			private function init():void
+			{
+				httpBookList.send({"pageJson.start": 0});
+			}
+
+			private function listHandler(evt:JsonResponseEvent):void
+			{
+				_js=evt.JsonObj;
+				_list=new ArrayCollection((evt.JsonObj.data) as Array);
+			}
+
+
+			/**删除回调方法*/
+			private function httpHandler(evt:JsonResponseEvent):void
+			{
+				var response:Object=evt.JsonObj;
+				if (response.success)
+				{
+					Alert.show(response.msg, "操作提示！");
+					init();
+				}
+				else
+				{
+					Alert.show(response.msg, "操作提示!");
+				}
+			}
+
+			/**搜索*/
+			private function search():void
+			{
+				var param:Object=new Object;
+				param["pageJson.searchKey"]=searchKey.selectedItem.key;
+				param["pageJson.searchValue"]=searchValue.text;
+				param["pageJson.start"]=0;
+				httpBookList.send(param);
+			}
+
+
+
+			private function onEditClick():void
+			{
+				var win:BookManageWin=new BookManageWin();
+				win.obj=dg.selectedItem;
+				win.title="修改图书信息";
+				win.callBackFun=init;
+				PopUpManager.addPopUp(win, this, true);
+				PopUpManager.centerPopUp(win);
+			}
+
+			private function addBook():void
+			{
+				var win:BookManageWin=new BookManageWin();
+				win.title="增加图书信息";
+				win.callBackFun=init;
+				PopUpManager.addPopUp(win, this, true);
+				PopUpManager.centerPopUp(win);
+			}
+
+			/**删除方法*/
+			private function onDelClick():void
+			{
+				var ids:Array=new Array();
+				for (var i:int=0; i < _list.length; i++)
+				{
+					if (_list[i].dgSelected)
+					{
+						ids.push(_list[i].id);
+					}
+				}
+				if (ids.length != 0)
+				{
+					Alert.yesLabel="确定";
+					Alert.cancelLabel="取消";
+					Alert.show("确定是否删除选定项目？", "操作提示:", Alert.YES | Alert.CANCEL, this, alertClickHandler);
+					function alertClickHandler(event:CloseEvent):void
+					{
+						if (event.detail == Alert.YES)
+						{
+							httpBookDel.send({"ids": ids});
+						}
+					}
+				}
+				else
+				{
+					Alert.show("请选择要删除的项目", "操作提示！");
+				}
+			}
+
+
+
+
+			private function rowNum(item:Object, column:int):String
+			{
+				var index:int=this.dg.dataProvider.getItemIndex(item) + 1;
+				return String(index);
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="listHandler(event)" id="httpBookList" action="FileManager/FileManagerAction!getBooksList"/>
+	<lml:CommonHttpService onJsonResponse="httpHandler(event)" id="httpBookDel" action="FileManager/FileManagerAction!delBook"/>
+
+	<mx:Panel width="100%" height="100%" layout="vertical" title="图书管理" titleIcon="@Embed(source='images/book_edit.png')">
+		<mx:VBox label="图书管理" width="100%" height="100%">
+			<mx:HBox width="100%" height="40" verticalAlign="middle">
+				<mx:Label text="请输入查询关键字"/>
+				<mx:ComboBox id="searchKey">
+					<mx:dataProvider>
+						<mx:Array>
+							<mx:Object label="ISBN号" key="isbn"/>
+							<mx:Object label="书名" key="name"/>
+							<mx:Object label="作者" key="authors"/>
+							<mx:Object label="丛书名" key="series"/>
+							<mx:Object label="发版书行" key="publisher"/>
+							<mx:Object label="价格" key="price"/>
+						</mx:Array>
+					</mx:dataProvider>
+				</mx:ComboBox>
+				<mx:TextInput id="searchValue"/>
+				<mx:Button label="搜　索" click="search()" icon="@Embed(source='../images/search.png')"/>
+			</mx:HBox>
+			<mx:HBox width="100%" height="100%">
+				<mx:VBox height="100%" width="114" horizontalAlign="center">
+					<mx:Button label="创建" width="93" click="addBook()" styleName="add"/>
+					<mx:Button label="修改" width="93" styleName="edit"/>
+					<mx:Button label="删除" width="93" styleName="del" click="onDelClick()"/>
+					<mx:Button label="刷新" width="93" click="init()" styleName="refresh"/>
+				</mx:VBox>
+				<mx:VBox height="100%" width="100%">
+					<lml:CommonGrid id="dg" width="100%" height="100%" textAlign="center" dataProvider="{_list}" doubleClickEnabled="true" itemDoubleClick="onEditClick()">
+						<lml:columns>
+							<mx:Array>
+								<mx:DataGridColumn headerText="序号" width="40" labelFunction="rowNum"/>
+								<mx:DataGridColumn headerText="ISBN号" dataField="isbn"/>
+								<mx:DataGridColumn headerText="书名" width="230" dataField="name"/>
+								<mx:DataGridColumn headerText="作者" dataField="authors"/>
+								<mx:DataGridColumn headerText="丛书名" dataField="series"/>
+								<mx:DataGridColumn headerText="出版发行" dataField="publisher"/>
+								<mx:DataGridColumn headerText="大小" dataField="bookSize"/>
+								<mx:DataGridColumn headerText="页数" dataField="pages"/>
+								<mx:DataGridColumn headerText="分类号" dataField="classifyNo"/>
+								<mx:DataGridColumn headerText="价格" dataField="price"/>
+							</mx:Array>
+						</lml:columns>
+					</lml:CommonGrid>
+					<lml:PageButton commHttp="{httpBookList}" id="paginator" itemsTotal="{_js.listCount}"/>
+				</mx:VBox>
+			</mx:HBox>
+		</mx:VBox>
+	</mx:Panel>
+</mx:Module>

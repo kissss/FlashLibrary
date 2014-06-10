@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionScriptProperties mainApplicationPath="index.mxml" version="3">
+<compiler additionalCompilerArguments="-locale en_US" copyDependentFiles="true" enableModuleDebug="true" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersion="9.0.124" htmlPlayerVersionCheck="true" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" useApolloConfig="false" verifyDigests="true" warn="true">
+<compilerSourcePath/>
+<libraryPath defaultLinkType="1">
+<libraryPathEntry kind="4" path=""/>
+<libraryPathEntry kind="1" linkType="1" path="libs"/>
+</libraryPath>
+<sourceAttachmentPath/>
+</compiler>
+<applications>
+<application path="index.mxml"/>
+</applications>
+<modules>
+<module application="src/index.mxml" destPath="library_log_manage/OperateLogManage.swf" optimize="true" sourcePath="src/library_log_manage/OperateLogManage.mxml"/>
+<module application="src/index.mxml" destPath="library_log_manage/LoginLogManage.swf" optimize="true" sourcePath="src/library_log_manage/LoginLogManage.mxml"/>
+<module application="src/index.mxml" destPath="library_file_manage/BookManage.swf" optimize="true" sourcePath="src/library_file_manage/BookManage.mxml"/>
+<module application="src/index.mxml" destPath="library_file_manage/ReaderManageWin.swf" optimize="true" sourcePath="src/library_file_manage/ReaderManageWin.mxml"/>
+<module application="src/index.mxml" destPath="library_file_manage/AdminManage.swf" optimize="true" sourcePath="src/library_file_manage/AdminManage.mxml"/>
+<module application="src/index.mxml" destPath="library_system_manage/ReaderTypeManage.swf" optimize="true" sourcePath="src/library_system_manage/ReaderTypeManage.mxml"/>
+<module application="src/index.mxml" destPath="ThemeWin.swf" optimize="true" sourcePath="src/ThemeWin.mxml"/>
+<module application="src/index.mxml" destPath="library_file_manage/InsertLibWin.swf" optimize="true" sourcePath="src/library_file_manage/InsertLibWin.mxml"/>
+<module application="src/index.mxml" destPath="library_file_manage/ReaderManage.swf" optimize="true" sourcePath="src/library_file_manage/ReaderManage.mxml"/>
+<module application="src/index.mxml" destPath="library_catalog_manage/BookListManageWin.swf" optimize="true" sourcePath="src/library_catalog_manage/BookListManageWin.mxml"/>
+<module application="src/index.mxml" destPath="library_system_manage/BookLocationManage.swf" optimize="true" sourcePath="src/library_system_manage/BookLocationManage.mxml"/>
+<module application="src/index.mxml" destPath="library_borrowing_manage/BookReturnManage.swf" optimize="true" sourcePath="src/library_borrowing_manage/BookReturnManage.mxml"/>
+<module application="src/index.mxml" destPath="library_catalog_manage/BookListManage.swf" optimize="true" sourcePath="src/library_catalog_manage/BookListManage.mxml"/>
+<module application="src/index.mxml" destPath="library_system_manage/ReaderTypeManageWin.swf" optimize="true" sourcePath="src/library_system_manage/ReaderTypeManageWin.mxml"/>
+<module application="src/index.mxml" destPath="library_system_manage/BookLocationManageWin.swf" optimize="true" sourcePath="src/library_system_manage/BookLocationManageWin.mxml"/>
+<module application="src/index.mxml" destPath="library_catalog_manage/BorrowInfoManage.swf" optimize="true" sourcePath="src/library_catalog_manage/BorrowInfoManage.mxml"/>
+<module application="src/index.mxml" destPath="library_file_manage/BookManageWin.swf" optimize="true" sourcePath="src/library_file_manage/BookManageWin.mxml"/>
+<module application="src/index.mxml" destPath="library_system_manage/SystemParameterManage.swf" optimize="true" sourcePath="src/library_system_manage/SystemParameterManage.mxml"/>
+<module application="src/index.mxml" destPath="CustomTheme.swf" optimize="true" sourcePath="src/CustomTheme.mxml"/>
+<module application="src/index.mxml" destPath="library_system_manage/SystemParameterManageWin.swf" optimize="true" sourcePath="src/library_system_manage/SystemParameterManageWin.mxml"/>
+<module application="src/index.mxml" destPath="library_file_manage/AdminManageWin.swf" optimize="true" sourcePath="src/library_file_manage/AdminManageWin.mxml"/>
+<module application="src/index.mxml" destPath="library_producerView/BookLocationManage.swf" optimize="true" sourcePath="src/library_producerView/BookLocationManage.mxml"/>
+</modules>
+<buildCSSFiles/>
+</actionScriptProperties>

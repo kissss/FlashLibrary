@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TitleWindow xmlns="flex.lml.Component.*" creationComplete="init()" xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:lml="flex.lml.Component.*" fontSize="12" layout="vertical" width="604" height="314"
+			 xmlns:lml1="http://www.lmllml.net">
+	<mx:Script>
+		<![CDATA[
+			import flash.sampler.Sample;
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.ArrayCollection;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.controls.Alert;
+			import mx.formatters.DateFormatter;
+			import mx.managers.PopUpManager;
+			import flex.lml.utils.ValidateUtil;
+			import mx.events.CloseEvent;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var readerTypeList:ArrayCollection;
+
+			public var callBackFun:Function;
+			[Bindable]
+			public var obj:Object;
+
+			private function init():void
+			{
+				httpReaderType.send();
+
+				if (obj.gender == '女')
+				{
+					_gender.selectedIndex=1;
+				}
+			}
+
+			/**列表处理*/
+			private function listHandler(evt:JsonResponseEvent):void
+			{
+
+			}
+
+			private function save():void
+			{
+				if (ValidateUtil.valid(form))
+				{
+					if (_passwd.text != _rePasswd.text)
+					{
+						Alert.show("两次密码输入不一致，请检查");
+					}
+					else
+					{
+						var param:Object=new Object;
+						if (obj != null) //表示更新
+						{
+							param["reader.id"]=obj.id;
+						}
+						param["reader.readerid"]=_readerid.text;
+						param["reader.name"]=_name.text;
+						param["reader.passwd"]=_passwd.text;
+						param["reader.gender"]=_gender.text;
+						param["reader.readerType_ID"]=readerType.selectedItem.id;
+						param["reader.tel"]=_tel.text;
+						param["reader.address"]=_address.text;
+						param["reader.startdate"]=_startdate.text;
+						param["reader.enddate"]=_enddate.text;
+						param["reader.readerRole_ID"]=1;
+
+						httpSaveOrUpdateReader.send(param);
+					}
+				}
+			}
+
+
+			public function insertLib():void
+			{
+				var win:InsertLibWin=new InsertLibWin;
+				if (obj.bookInfo != null)
+				{
+					win.title="修改入库信息";
+				}
+				win.obj=obj;
+				PopUpManager.addPopUp(win, this, true);
+				PopUpManager.centerPopUp(win);
+			}
+
+			private function httpReaderTypeHandler(evt:JsonResponseEvent):void
+			{
+				readerTypeList=new ArrayCollection(evt.JsonObj as Array);
+				for (var i:int=0; i < readerTypeList.length; i++)
+				{
+					if (readerTypeList[i].id == obj.readerType_ID)
+					{
+						readerType.selectedIndex=i;
+					}
+				}
+			}
+
+			private function onReturnHandler(evt:JsonResponseEvent):void
+			{
+				var response:Object=evt.JsonObj;
+				Alert.show(response.msg, "操作提示！");
+				callBackFun.call();
+				close();
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="httpReaderTypeHandler(event)" id="httpReaderType" action="SystemManage/SystemManageAction!getReaderTypeList"/>
+	<lml:CommonHttpService onJsonResponse="onReturnHandler(event)" id="httpSaveOrUpdateReader" action="FileManager/FileManagerAction!saveOrUpdateReader"/>
+	<lml:CommonHttpService onJsonResponse="onReturnHandler(event)" id="httpDelReaderReader" action="FileManager/FileManagerAction!delReaderReader"/>
+
+	<mx:Form id="form" width="100%" height="100%" horizontalCenter="50">
+		<mx:HBox width="100%">
+			<mx:FormItem label="学号:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_readerid" format="ISBN号~!" text="{obj.readerid}"/>
+			</mx:FormItem>
+			<mx:FormItem label="姓名:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_name" format="书名~!" text="{obj.name}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="密码:" required="true" labelWidth="70" width="251">
+				<lml:TextInput displayAsPassword="true" id="_passwd" format="密码~!" text="{obj.passwd}"/>
+			</mx:FormItem>
+			<mx:FormItem label="重复密码:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_rePasswd" displayAsPassword="true" format="重复密码~!" text="{obj.passwd}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="性别:" required="true" labelWidth="70" width="251">
+				<mx:ComboBox id="_gender">
+					<mx:dataProvider>
+						<mx:Array>
+							<mx:Object label="男"/>
+							<mx:Object label="女"/>
+						</mx:Array>
+					</mx:dataProvider>
+				</mx:ComboBox>
+			</mx:FormItem>
+			<mx:FormItem label="类型:" labelWidth="70" width="251">
+				<mx:ComboBox id="readerType" dataProvider="{readerTypeList}" labelField="name"/>
+
+			</mx:FormItem>
+		</mx:HBox>
+
+		<mx:HBox width="100%">
+
+			<mx:FormItem label="电话:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_tel" format="电话~!" text="{obj.tel}"/>
+			</mx:FormItem>
+			<mx:FormItem label="地址:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_address" format="地址~!" text="{obj.address}"/>
+			</mx:FormItem>
+
+
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="入学时间:" required="true" labelWidth="70" width="251">
+				<lml:DateField id="_startdate" width="100%" text="{obj.startdate}" editable="false"/>
+
+			</mx:FormItem>
+			<mx:FormItem label="毕业时间:" required="true" labelWidth="70" width="251">
+				<lml:DateField id="_enddate" width="100%" text="{obj.enddate}" editable="false"/>
+			</mx:FormItem>
+		</mx:HBox>
+
+	</mx:Form>
+	<mx:ControlBar paddingLeft="0" horizontalAlign="center">
+		<mx:Button label="保存" styleName="save" click="save()"/>
+		<mx:Button label="取消" styleName="cancel" click="close()"/>
+	</mx:ControlBar>
+</TitleWindow>

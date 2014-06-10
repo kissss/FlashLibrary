@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" width="100%" fontSize="12" height="100%" xmlns:lml="flex.lml.Component.*">
+	<mx:Script>
+		<![CDATA[
+			import flex.lml.Connection.JsonResponseEvent;
+			import flex.lml.Component.FileDownload;
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.core.Application;
+			import flash.external.ExternalInterface;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var _js:Object;
+			[Bindable]
+			public var isSubmit:Boolean;
+
+			private function init():void
+			{
+
+				httpLendInfoList.send();
+			}
+
+			private function listHandler(evt:JsonResponseEvent):void
+			{
+				_js=evt.JsonObj;
+				_list=new ArrayCollection((evt.JsonObj.data) as Array);
+			}
+
+
+
+			private function rowNum(item:Object, column:int):String
+			{
+				var index:int=this.dg.dataProvider.getItemIndex(item) + 1;
+				return String(index);
+			}
+
+			public function returnBook():void
+			{
+				Alert.yesLabel="确定";
+				Alert.cancelLabel="取消";
+				Alert.show("确定是否归还此书？", "操作提示:", Alert.YES | Alert.CANCEL, this, alertClickHandler);
+				function alertClickHandler(event:CloseEvent):void
+				{
+					if (event.detail == Alert.YES)
+					{
+						var param:Object=new Object;
+						param["lendInfo.id"]=dg.selectedItem.id; //修改借阅信息
+						param["bookInfo.id"]=dg.selectedItem.bookInfo_ID; //还要修改 馆藏信息
+						httpHistoryInfoList.send(param);
+					}
+				}
+			}
+
+			public function onReturnHandler(evt:JsonResponseEvent):void
+			{
+				Alert.show(evt.JsonObj.msg, "提示");
+				init();
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService id="httpLendInfoList" onJsonResponse="listHandler(event)" action="CatalogManage/CatalogManageAction!getBorrowInfo"/>
+	<lml:CommonHttpService id="httpHistoryInfoList" onJsonResponse="onReturnHandler(event)" action="CatalogManage/CatalogManageAction!returnBook"/>
+	<mx:Panel width="100%" height="100%" layout="vertical" title="借阅信息" titleIcon="@Embed(source='images/book_edit.png')">
+		<mx:Canvas label="当前借阅" width="100%" height="100%">
+			<mx:VBox height="100%" width="100%">
+				<lml:CommonGrid id="dg" width="100%" textAlign="center" height="100%" dataProvider="{_list}">
+					<lml:columns>
+						<mx:Array>
+							<mx:DataGridColumn headerText="序号" width="40" labelFunction="rowNum"/>
+							<mx:DataGridColumn headerText="书名" dataField="bookData_name"/>
+							<mx:DataGridColumn headerText="作者" dataField="bookData_authors"/>
+							<mx:DataGridColumn headerText="出版发行" dataField="bookData_publisher"/>
+							<mx:DataGridColumn headerText="借阅时间" dataField="borrowdate"/>
+							<mx:DataGridColumn headerText="应还时间" dataField="duedate"/>
+							<mx:DataGridColumn>
+								<mx:itemRenderer>
+									<mx:Component>
+										<mx:LinkButton icon="@Embed(source='../images/application_go.png')" label="还书" click="{outerDocument.returnBook()}"/>
+									</mx:Component>
+								</mx:itemRenderer>
+							</mx:DataGridColumn>
+						</mx:Array>
+					</lml:columns>
+				</lml:CommonGrid>
+				<lml:PageButton commHttp="{httpLendInfoList}" id="paginator" itemsTotal="{_js.listCount}"/>
+			</mx:VBox>
+		</mx:Canvas>
+	</mx:Panel>
+</mx:Module>

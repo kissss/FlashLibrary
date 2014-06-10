@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" fontSize="12" width="100%" height="100%" xmlns:lml="flex.lml.Component.*">
+	<mx:Script>
+		<![CDATA[
+			import json.JSerialize;
+			import mx.collections.ArrayCollection;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.controls.Alert;
+			
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var _js:Object;
+			
+			private function init():void{
+				paginator.resetPage();
+			}
+			
+			
+			/**列表处理*/
+			private function listHandler(evt:JsonResponseEvent):void{
+				_js = evt.JsonObj;
+				_list = new ArrayCollection((evt.JsonObj.data) as Array);
+			}
+			
+			
+			private function httpHandler(evt:JsonResponseEvent):void{
+				var response:Object = evt.JsonObj;
+				if(response.success){
+					Alert.show(response.msg,"操作提示！");
+					init();
+				}else{
+					Alert.show(response.msg,"操作提示!");
+				}
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="listHandler(event)" id="httpLogsList" action="Log/LogAction!getLoginLogList"/>
+	<mx:Panel width="100%" height="100%" layout="vertical" title="用户登录日志" titleIcon="@Embed(source='images/book_edit.png')">
+			<mx:HBox width="100%" height="100%">
+			<mx:VBox height="100%" width="100%">
+				<lml:CommonGrid id="dgrid" width="100%" height="100%" dataProvider="{_list}" >
+					<lml:columns>
+						<mx:Array>
+							<mx:DataGridColumn textAlign="center" headerText="用户ID" dataField="readerid"/>
+							<mx:DataGridColumn textAlign="center" headerText="用户姓名" dataField="name"/>
+							<mx:DataGridColumn textAlign="center" headerText="登录IP" dataField="ip"/>
+							<mx:DataGridColumn textAlign="center" headerText="登录时间" dataField="loginDate"/>
+							<mx:DataGridColumn textAlign="center" headerText="事件" dataField="detail"/>						
+						</mx:Array>
+					</lml:columns>
+				</lml:CommonGrid>
+				<lml:PageButton commHttp="{httpLogsList}" id="paginator" itemsTotal="{_js.listCount}"/>
+			</mx:VBox>
+		</mx:HBox>
+	</mx:Panel>	
+</mx:Module>

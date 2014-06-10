@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TitleWindow xmlns="flex.lml.Component.*" creationComplete="init()" xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:lml="flex.lml.Component.*" fontSize="12" layout="vertical" width="354" height="252"
+			 xmlns:lml1="http://www.lmllml.net">
+	<mx:Script>
+		<![CDATA[
+			import flash.sampler.Sample;
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.ArrayCollection;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.controls.Alert;
+			import mx.formatters.DateFormatter;
+			import mx.managers.PopUpManager;
+			import flex.lml.utils.ValidateUtil;
+			import mx.events.CloseEvent;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var readerTypeList:ArrayCollection;
+
+			public var callBackFun:Function;
+			[Bindable]
+			public var obj:Object;
+
+			private function init():void
+			{
+				//httpReaderTypeList.send();
+			}
+
+			private function save():void
+			{
+				if (ValidateUtil.valid(form))
+				{
+					var param:Object=new Object;
+					if (obj != null) //表示更新
+					{
+						param["parameter.id"]=obj.id;
+					}
+					/* param["parameter.ReaderType_ID"]=readerType.selectedItem.id; */
+					
+					param["parameter.name"]=_name.text;
+					param["parameter.amount"]=_amount.text;
+					param["parameter.period"]=_period.text;
+					param["parameter.dailyfine"]=_dailyfine.text;
+
+					httpSaveOrUpdateParameter.send(param);
+				}
+			}
+
+			private function onReturnHandler(evt:JsonResponseEvent):void
+			{
+				var response:Object=evt.JsonObj;
+				Alert.show(response.msg, "操作提示！");
+				callBackFun.call();
+				close();
+			}
+			/* private function getReaderTypeHandler(evt:JsonResponseEvent):void
+			{
+				readerTypeList=new ArrayCollection(evt.JsonObj as Array);
+				for (var i:int=0; i < readerTypeList.length; i++)
+				{
+					if (readerTypeList[i].id == obj.readerType_ID)
+					{
+						readerType.selectedIndex=i;
+					}
+				}
+			} */
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="onReturnHandler(event)" id="httpSaveOrUpdateParameter" action="SystemManage/SystemManageAction!saveOrUpdateParameter"/>
+	<!--<lml:CommonHttpService onJsonResponse="getReaderTypeHandler(event)" id="httpReaderTypeList" action="SystemManage/SystemManageAction!getReaderTypeList"/>-->
+
+	<mx:Form id="form" width="100%" height="100%">
+		<mx:HBox width="100%">
+			<mx:FormItem label="读者类型:" required="true" labelWidth="100" width="100%">
+				<!--<mx:ComboBox id="readerType" dataProvider="{readerTypeList}" labelField="name"/>-->
+				<lml:TextInput id="_name" format="借书数量~int!" text="{obj.name}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="借书数量(本):" required="true" labelWidth="100" width="100%">
+				<lml:TextInput id="_amount" format="借书数量~int!" text="{obj.amount}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="借书天数(天):" required="true" labelWidth="100" width="100%">
+				<lml:TextInput id="_period" format="借书天数~int!" text="{obj.period}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="超期罚金(元):" required="true" labelWidth="100" width="100%">
+				<lml:TextInput id="_dailyfine" format="超期罚金~float!" text="{obj.dailyfine}"/>
+			</mx:FormItem>
+		</mx:HBox>
+	</mx:Form>
+	<mx:ControlBar paddingLeft="0" horizontalAlign="center">
+		<mx:Button label="保存" styleName="save" click="save()"/>
+		<mx:Button label="取消" styleName="cancel" click="close()"/>
+	</mx:ControlBar>
+</TitleWindow>

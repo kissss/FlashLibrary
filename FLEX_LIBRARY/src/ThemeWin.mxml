@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" fontSize="12" xmlns:lml="flex.lml.Component.*" creationComplete="init()" layout="vertical" showCloseButton="true" close="close()" width="660"
+				height="528" title="主题选择窗口">
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+
+			public var callBackFun:Function;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.collections.ArrayCollection;
+			import mx.events.CloseEvent;
+
+
+			private function init():void
+			{
+				themeListHttp.send();
+
+			}
+
+			private function save(event:Event):void
+			{
+				var img_source:String=event.currentTarget.source;
+				var img_name:String=img_source.substr(img_source.indexOf("/") + 1, img_source.length);
+				themeHttp.send({"theme.THEME_NAME": event.currentTarget.name, "theme.IMAGE_URL": img_name});
+				//PopUpManager.removePopUp(this);
+
+			}
+
+			private function saveMy(o:Object):void
+			{
+				themeHttp.send({"theme.THEME_NAME": o.THEME_NAME, "theme.IMAGE_URL": o.IMAGE_URL, "theme.ID": o.ID});
+			}
+
+			/**回调重置到第二页*/
+			public function callBack():void
+			{
+				init();
+				tab.selectedIndex=1;
+			}
+
+			private function CustomThemeClick():void
+			{
+				var win:CustomTheme=new CustomTheme();
+				win.callBackFun=callBack;
+				PopUpManager.addPopUp(win, this, true);
+				PopUpManager.centerPopUp(win);
+			}
+
+			private function close():void
+			{
+				PopUpManager.removePopUp(this);
+			}
+
+			private function themeHttpHandler(evt:JsonResponseEvent):void
+			{
+				var resp:Object=evt.JsonObj;
+				if (resp.success)
+				{
+					Alert.buttonWidth=100;
+					Alert.yesLabel="立即生效";
+					Alert.cancelLabel="下次生效";
+					Alert.show("您修改了主题！需要重新登录才能生效！是否重新登录？", "操作提示:", Alert.YES | Alert.CANCEL, this, alertClickHandler);
+					function alertClickHandler(event:CloseEvent):void
+					{
+						if (event.detail == Alert.YES)
+						{
+							ExternalInterface.call("eval", "location.reload();");
+						}
+					}
+				}
+				else
+				{
+					Alert.show(resp.msg, "操作提示！");
+				}
+			}
+
+			public function del(id:String):void
+			{
+				themeDelHttp.send({"theme.ID": id});
+			}
+
+			[Bindable]
+			private var themes:ArrayCollection;
+
+			private function themeListHttpHandler(evt:JsonResponseEvent):void
+			{
+				themes=null;
+				themes=new ArrayCollection(evt.JsonObj.data as Array);
+			}
+
+			/**删除回调方法*/
+			private function themeDelHttpHandler(evt:JsonResponseEvent):void
+			{
+				var resp:Object=evt.JsonObj;
+				if (resp.success)
+				{
+					init();
+				}
+				else
+				{
+					Alert.show(resp.msg, "操作提示！");
+				}
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService id="themeHttp" onJsonResponse="themeHttpHandler(event)" action="hr_base/ThemeAction!save"/>
+	<lml:CommonHttpService id="themeListHttp" onJsonResponse="themeListHttpHandler(event)" action="hr_base/ThemeAction!getUserTheme"/>
+	<lml:CommonHttpService id="themeDelHttp" onJsonResponse="themeDelHttpHandler(event)" action="hr_base/ThemeAction!delTheme"/>
+
+	<mx:TabNavigator width="100%" height="100%" id="tab">
+		<mx:Tile id="tile" direction="horizontal" width="100%" label="系统背景">
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Main.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/default.png" width="188" height="144"/>
+				<mx:Label text="默认主题"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme01.jpg" width="188" height="144"/>
+				<mx:Label text="主题1"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme02.jpg" width="188" height="144"/>
+				<mx:Label text="主题2"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme03.jpg" width="188" height="144"/>
+				<mx:Label text="主题3"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme04.jpg" width="188" height="144"/>
+				<mx:Label text="主题4"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme05.jpg" width="188" height="144"/>
+				<mx:Label text="主题5"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme06.jpg" width="188" height="144"/>
+				<mx:Label text="主题6"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme07.jpg" width="188" height="144"/>
+				<mx:Label text="主题7"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme08.jpg" width="188" height="144"/>
+				<mx:Label text="主题8"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme09.jpg" width="188" height="144"/>
+				<mx:Label text="主题09"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme10.jpg" width="188" height="144"/>
+				<mx:Label text="主题10"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme11.jpg" width="188" height="144"/>
+				<mx:Label text="主题11"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme12.jpg" width="188" height="144"/>
+				<mx:Label text="主题12"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme13.jpg" width="188" height="144"/>
+				<mx:Label text="主题13"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme14.jpg" width="188" height="144"/>
+				<mx:Label text="主题14"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme15.jpg" width="188" height="144"/>
+				<mx:Label text="主题15"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme16.jpg" width="188" height="144"/>
+				<mx:Label text="主题16"/>
+			</mx:VBox>
+			<mx:VBox horizontalAlign="center">
+				<mx:Image name="css/Aero.swf" doubleClickEnabled="true" doubleClick="save(event)" toolTip="双击更换主题" source="images/theme17.jpg" width="188" height="144"/>
+				<mx:Label text="主题17"/>
+			</mx:VBox>
+
+
+		</mx:Tile>
+		<mx:Tile label="我的主题" direction="horizontal" width="100%">
+			<mx:Repeater dataProvider="{themes}" id="rep">
+				<mx:VBox horizontalAlign="center">
+					<mx:Image name="css/Aero.swf" doubleClickEnabled="true" toolTip="双击更换主题" doubleClick="saveMy(event.currentTarget.getRepeaterItem())"
+							  source="{CommonHttpService.ROOT_URL+'/photo/'+rep.currentItem.IMAGE_URL}" width="188" height="144"/>
+					<mx:Label text="{rep.currentItem.USED_DATE}"/>
+					<mx:HBox>
+						<mx:LinkButton label="删除" click="del(event.currentTarget.getRepeaterItem().ID)"/>
+						<mx:LinkButton label="使用" click="saveMy(event.currentTarget.getRepeaterItem())"/>
+					</mx:HBox>
+				</mx:VBox>
+			</mx:Repeater>
+
+		</mx:Tile>
+	</mx:TabNavigator>
+
+	<mx:HBox width="100%" horizontalAlign="right" paddingRight="0">
+		<mx:Label text="注：使用主题时系统会自动返回到登录界面，用户重新登录后，可享受新主题！" color="red"/>
+		<mx:HRule width="100%" visible="false"/>
+		<mx:Button label="自定义主题" click="CustomThemeClick()"/>
+	</mx:HBox>
+
+</mx:TitleWindow>

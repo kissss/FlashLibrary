@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:lml="flex.lml.Component.*" close="close()" showCloseButton="true" layout="vertical" width="400" height="300">
+	<mx:Script>
+		<![CDATA[
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+
+			[Bindable]
+			public var callBackFun:Function;
+
+			private function save():void
+			{
+				if (imagedown._imageId != null)
+				{
+					themeHttp.send({"theme.THEME_NAME": "css/Aero.swf", "theme.IMAGE_ID": imagedown._imageId});
+				}
+				else
+				{
+					Alert.show("请上传图片！", "操作提示！");
+				}
+
+			}
+
+			private function themeHttpHandler(evt:JsonResponseEvent):void
+			{
+				var resp:Object=evt.JsonObj;
+				if (resp.success)
+				{
+					//ExternalInterface.call("eval", "location.reload();");
+					//Alert.show(resp.msg,"操作提示！");
+					//var win:CustomTheme=new CustomTheme();
+					//PopUpManager.addPopUp(win,this,true);
+					//PopUpManager.centerPopUp(win);
+					callBackFun();
+					close();
+				}
+			}
+
+			private function close():void
+			{
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService id="themeHttp" onJsonResponse="themeHttpHandler(event)" action="hr_base/ThemeAction!save"/>
+	<mx:Label text="点击下面空白处上传图片"/>
+	<lml:ImageDownLoad id="imagedown" width="100%" height="100%" click="imagedown.imageupload()"/>
+	<mx:HBox width="100%" horizontalAlign="right">
+		<mx:Button label="保存" click="save()"/>
+	</mx:HBox>
+</mx:TitleWindow>

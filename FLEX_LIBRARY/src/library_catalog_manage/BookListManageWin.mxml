@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TitleWindow xmlns="flex.lml.Component.*" creationComplete="init()" xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:lml="flex.lml.Component.*" fontSize="12" layout="vertical" width="588" height="612"
+			 xmlns:lml1="http://www.lmllml.net">
+	<mx:Script>
+		<![CDATA[
+			import flash.sampler.Sample;
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.ArrayCollection;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.controls.Alert;
+			import mx.formatters.DateFormatter;
+			import mx.managers.PopUpManager;
+			import flex.lml.utils.ValidateUtil;
+			import mx.events.CloseEvent;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+
+			public var callBackFun:Function;
+			[Bindable]
+			public var obj:Object;
+
+			private function init():void
+			{
+				_list=new ArrayCollection(obj.bookInfos as Array);
+			}
+
+			public function borrow():void
+			{
+				var param:Object=new Object;
+				param["lendInfo.bookcode"]=dg.selectedItem.barcode; //保存借阅信息
+				param["lendInfo.bookInfo_ID"]=dg.selectedItem.id;
+				param["bookInfo.id"]=dg.selectedItem.id; //还要修改 馆藏信息
+				httpSaveLendInfo.send(param);
+			}
+
+
+			public function httpSaveLendInfoHandler(evt:JsonResponseEvent):void
+			{
+				Alert.show(evt.JsonObj.msg, "提示");
+				close();
+				callBackFun.call();
+			}
+
+			private function rowNum(item:Object, column:int):String
+			{
+				var index:int=this.dg.dataProvider.getItemIndex(item) + 1;
+				return String(index);
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="httpSaveLendInfoHandler(event)" id="httpSaveLendInfo" action="CatalogManage/CatalogManageAction!saveLendInfo"/>
+
+	<mx:Form id="form" width="100%" height="294" horizontalCenter="50">
+		<mx:HBox width="100%">
+			<mx:FormItem label="ISBN号:" labelWidth="70" width="251">
+				<lml:TextInput id="_isbn" editable="false" text="{obj.isbn}"/>
+			</mx:FormItem>
+			<mx:FormItem label="书名:" labelWidth="70" width="251">
+				<lml:TextInput id="_name" editable="false" text="{obj.name}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="作者:" labelWidth="70" width="251">
+				<lml:TextInput id="_authors" editable="false" text="{obj.authors}"/>
+			</mx:FormItem>
+			<mx:FormItem label="丛书名:" labelWidth="70" width="251">
+				<lml:TextInput id="_series" editable="false" text="{obj.series}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="出版发行:" labelWidth="70" width="251">
+				<lml:TextInput id="_publisher" editable="false" text="{obj.publisher}" width="160"/>
+			</mx:FormItem>
+			<mx:FormItem label="图书数量:" labelWidth="70" width="251">
+				<lml:TextInput id="_booksCount" editable="false" text="{obj.booksCount}"/>
+			</mx:FormItem>
+		</mx:HBox>
+
+		<mx:HBox width="100%">
+
+			<mx:FormItem label="大小:" labelWidth="70" width="251">
+				<lml:TextInput id="_bookSize" editable="false" text="{obj.bookSize}"/>
+			</mx:FormItem>
+			<mx:FormItem label="页数:" labelWidth="70" width="251">
+				<lml:TextInput id="_pages" editable="false" text="{obj.pages}"/>
+			</mx:FormItem>
+
+
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="分类号:" labelWidth="70" width="251">
+				<lml:TextInput id="_classifyNo" editable="false" text="{obj.classifyNo}"/>
+			</mx:FormItem>
+			<mx:FormItem label="价格:" labelWidth="70" width="251">
+				<lml:TextInput id="_price" editable="false" text="{obj.price}"/>
+			</mx:FormItem>
+		</mx:HBox>
+
+		<mx:HBox width="100%">
+			<mx:FormItem label="图书简介" width="100%" labelStyleName="" labelWidth="70">
+				<lml:TextArea id="_introduction" editable="false" width="100%" height="100" label="图书简介" text="{obj.introduction}"/>
+			</mx:FormItem>
+		</mx:HBox>
+	</mx:Form>
+	<lml:CommonGrid id="dg" width="100%" height="100%" textAlign="center" dataProvider="{_list}">
+		<lml:columns>
+			<mx:Array>
+				<mx:DataGridColumn headerText="序号" width="40" labelFunction="rowNum"/>
+				<mx:DataGridColumn headerText="图书条形码" dataField="barcode"/>
+				<mx:DataGridColumn headerText="图书馆藏位置" dataField="bookLocation_location"/>
+				<mx:DataGridColumn headerText="图书状态" width="100" color="green">
+					<mx:itemRenderer>
+						<mx:Component>
+							<mx:LinkButton icon="@Embed(source='../images/user_edit.png')" enabled="{data.status==1}" label="{data.status==1?'可借':'已借'}" click="{outerDocument.borrow()}"/>
+						</mx:Component>
+					</mx:itemRenderer>
+				</mx:DataGridColumn>
+			</mx:Array>
+		</lml:columns>
+	</lml:CommonGrid>
+</TitleWindow>

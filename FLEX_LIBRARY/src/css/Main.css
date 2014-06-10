@@ -1,0 +1,127 @@
+/* CSS file */
+global
+{
+   fontFamily: Arial;
+   fontSize: 12;
+}
+
+
+Panel {
+   borderColor: #C6D7E6;
+   borderAlpha: 1;
+   borderThicknessLeft: 9;
+   borderThicknessTop: 1;
+   borderThicknessBottom: 8;
+   borderThicknessRight: 10;
+   headerHeight: 28;
+   backgroundAlpha: 1;
+   shadowDistance: 1;
+   titleStyleName: "mypanelTitle";
+}
+
+.mypanelTitle {
+   letterSpacing: 0;
+}
+Accordion {
+ fillColors: #D9D9D9, #608DB7, #ffffff, #eeeeee;
+   borderStyle: inset;
+   borderThickness: 1;
+   headerHeight: 30;
+   textIndent: 5;
+     backgroundAlpha: 0.9;
+   dropShadowEnabled: false;
+   headerStyleName: "myaccordionHeader"; 
+}
+
+.myaccordionHeader {
+   fontFamily: Arial Black;
+   fontSize: 14;
+   fontWeight: bold;
+}
+
+Label{
+	fontSize: 12;
+	fontWeight:bold;
+}
+TabNavigator {
+   textIndent: 0;
+   dropShadowEnabled: true;
+   shadowDirection: right;
+   fontFamily: Arial;
+   fontSize: 12px;
+}
+.linkbotton{
+fontSize: 12;
+fontWeight: normal;
+}
+.save{
+ icon:Embed(source='../images/save.png');
+ width:84px;
+ }
+ .cancel{
+ icon:Embed(source='../images/cancel.png');
+ width:84px;
+ }
+ 
+  .back{
+ icon:Embed(source='../images/arrow_rotate_clockwise.png');
+ width:84px;
+ }
+ 
+  .search{
+ icon:Embed(source='../images/search.png');
+ width:100px;
+ }
+
+.add{
+ icon:Embed(source='../images/add.gif');
+ width:84px;
+ }
+.edit{
+ icon:Embed(source='../images/user_edit.png');
+ width:84px;
+ }
+.del{
+ icon:Embed(source='../images/cross.gif');
+ width:84px;
+ }
+.reduce{
+ icon:Embed(source='../images/reduce.png');
+ width:84px;
+ }
+.borrow{
+ icon:Embed(source='../images/book_go.png');
+ width:84px;
+ }
+.grid{
+ icon:Embed(source='../images/grid.png');
+ width:84px;
+ }
+ .refresh{
+ icon:Embed(source='../images/table_refresh.png');
+ width:84px;
+ }
+ .down{
+ icon:Embed(source='../images/down.gif');
+ width:84px;
+ }
+  .upload{
+ icon:Embed(source='../images/upload.gif');
+ width:84px;
+ }
+  .excel{
+icon:Embed(source='../images/excel.png');
+ width:84px;
+ }
+  .input{
+	borderSides:bottom;
+	borderColor:#cccccc;
+	borderStyle:solid;
+	editable:false;
+	textAlign:left;
+}
+.errorTip {
+         borderColor: haloOrange;
+         color: black;
+         fontSize: 12;
+     }

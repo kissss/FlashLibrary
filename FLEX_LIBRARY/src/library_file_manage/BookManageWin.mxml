@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TitleWindow xmlns="flex.lml.Component.*" creationComplete="init()" xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:lml="flex.lml.Component.*" fontSize="12" layout="vertical" width="578" height="422"
+			 xmlns:lml1="http://www.lmllml.net">
+	<mx:Script>
+		<![CDATA[
+			import flash.sampler.Sample;
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.ArrayCollection;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.controls.Alert;
+			import mx.formatters.DateFormatter;
+			import mx.managers.PopUpManager;
+			import flex.lml.utils.ValidateUtil;
+			import mx.events.CloseEvent;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+
+			public var callBackFun:Function;
+			[Bindable]
+			public var obj:Object;
+
+			private function init():void
+			{
+				if (obj.bookInfo != null)
+				{
+					insertLibLabel.label="入库信息";
+				}
+			}
+
+			/**列表处理*/
+			private function listHandler(evt:JsonResponseEvent):void
+			{
+
+			}
+
+			private function save():void
+			{
+				if (ValidateUtil.valid(form))
+				{
+					var param:Object=new Object;
+					if (obj != null) //表示更新
+					{
+						param["bookData.id"]=obj.id;
+					}
+					param["bookData.isbn"]=_isbn.text;
+					param["bookData.name"]=_name.text;
+					param["bookData.authors"]=_authors.text;
+					param["bookData.series"]=_series.text == "" ? "无" : _series.text;
+					param["bookData.publisher"]=_publisher.text;
+					param["bookData.bookSize"]=_bookSize.text;
+					param["bookData.pages"]=_pages.text;
+					param["bookData.classifyNo"]=_classifyNo.text;
+					param["bookData.price"]=_price.text;
+					param["bookData.introduction"]=_introduction.text;
+					param["bookData.createTime"]=_createTime.text;
+					param["bookData.createName"]=_createName.text;
+					param["bookData.booksCount"]=_booksCount.text;
+
+					httpSaveOrUpdateBook.send(param);
+				}
+			}
+
+
+			public function insertLib():void
+			{
+				var win:InsertLibWin=new InsertLibWin;
+				if (obj.bookInfo != null)
+				{
+					win.title="修改入库信息";
+				}
+				win.obj=obj;
+				PopUpManager.addPopUp(win, this, true);
+				PopUpManager.centerPopUp(win);
+			}
+
+			public function httpSaveOrUpdateBookHandler(evt:JsonResponseEvent):void
+			{
+				Alert.show(evt.JsonObj.msg, "提示");
+				close();
+				callBackFun.call();
+			}
+
+			private function sendKeyHandler(evt:KeyboardEvent):void
+			{
+				//Enter 键
+				if (evt.keyCode == 13)
+				{
+					save();
+					return;
+				}
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="httpSaveOrUpdateBookHandler(event)" id="httpSaveOrUpdateBook" action="FileManager/FileManagerAction!savaOrUpdateBook"/>
+
+	<mx:Form id="form" width="100%" height="100%" horizontalCenter="50" keyDown="sendKeyHandler(event)">
+		<mx:HBox width="100%">
+			<mx:FormItem label="ISBN号:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_isbn" format="ISBN号~!" text="{obj.isbn}"/>
+			</mx:FormItem>
+			<mx:FormItem label="书名:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_name" format="书名~!" text="{obj.name}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="作者:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_authors" format="作者~!" text="{obj.authors}"/>
+			</mx:FormItem>
+			<mx:FormItem label="丛书名:" labelWidth="70" width="251">
+				<lml:TextInput id="_series" text="{obj.series}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="出版发行:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_publisher" format="出版发行!" text="{obj.publisher}" width="160"/>
+			</mx:FormItem>
+			<mx:FormItem label="图书数量:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_booksCount" format="图书数量~int!" enabled="{obj==null}" text="{obj.booksCount}"/>
+			</mx:FormItem>
+		</mx:HBox>
+
+		<mx:HBox width="100%">
+
+			<mx:FormItem label="大小:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_bookSize" format="图书大小~!" text="{obj.bookSize}"/>
+			</mx:FormItem>
+			<mx:FormItem label="页数:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_pages" format="页数~int!" text="{obj.pages}"/>
+			</mx:FormItem>
+
+
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="分类号:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_classifyNo" format="分类号~!" text="{obj.classifyNo}"/>
+			</mx:FormItem>
+			<mx:FormItem label="价格:" required="true" labelWidth="70" width="251">
+				<lml:TextInput id="_price" format="价格~float!" text="{obj.price}"/>
+			</mx:FormItem>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:FormItem label="创建时间:" labelWidth="70" width="251">
+				<lml:TextInput id="_createTime" editable="false" text="{obj==null?'由系统自动读取':obj.createTime}"/>
+			</mx:FormItem>
+			<mx:FormItem label="录入人:" labelWidth="70" width="251">
+				<lml:TextInput id="_createName" editable="false" text="{obj==null?'由系统自动读取':obj.createName}"/>
+			</mx:FormItem>
+		</mx:HBox>
+
+		<mx:HBox width="100%">
+			<mx:FormItem label="图书简介" width="100%" labelStyleName="" labelWidth="70">
+				<lml:TextArea id="_introduction" width="100%" height="100" label="图书简介" text="{obj.introduction}"/>
+			</mx:FormItem>
+		</mx:HBox>
+
+	</mx:Form>
+	<mx:ControlBar paddingLeft="0" horizontalAlign="center">
+		<mx:Button label="保存" styleName="save" click="save()"/>
+		<mx:Button label="入库" id="insertLibLabel" styleName="add" enabled="{obj!=null}" click="insertLib()"/>
+		<mx:Button label="取消" styleName="cancel" click="close()"/>
+	</mx:ControlBar>
+</TitleWindow>

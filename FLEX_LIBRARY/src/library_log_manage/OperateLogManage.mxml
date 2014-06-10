@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" fontSize="12" width="100%" height="100%" xmlns:lml="flex.lml.Component.*">
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import flex.lml.Connection.JsonResponseEvent;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var _js:Object;
+
+			private function init():void
+			{
+				paginator.resetPage();
+			}
+
+			private function listHandler(evt:JsonResponseEvent):void
+			{
+				_js=evt.JsonObj;
+				_list=new ArrayCollection((evt.JsonObj.data) as Array);
+
+			}
+
+			private function search():void
+			{
+				paginator.param.isSearch=true;
+				paginator.param.fromTime=fromTime.text;
+				paginator.param.toTime=toTime.text;
+				paginator.selectedIndex=0;
+			}
+
+			private function toTimeChange():void
+			{
+				if (fromTime.text != "" && toTime.text != "")
+				{
+					if (fromTime.text > toTime.text)
+					{
+						Alert.show("起始日期不能大于终止日期！", "操作提示！");
+						toTime.text="";
+					}
+				}
+			}
+
+			//返回列表
+			private function _callBack():void
+			{
+				init();
+				fromTime.text="";
+				toTime.text=""
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="listHandler(event)" id="httpList" action="Log/LogAction!getOperateLogList"/>
+	<mx:Panel width="100%" height="100%" layout="vertical" title="查看日志" titleIcon="@Embed(source='images/book_edit.png')">
+		<mx:HBox width="100%" height="40" verticalAlign="middle">
+			<mx:Label text="查询时间 "/>
+			<mx:Label text="从："/>
+			<mx:DateField id="fromTime" formatString="YYYY-MM-DD" dayNames="[日,一,二,三,四,五,六]" monthNames="[一月,二月,三月,四月,五月,六月,七月,八月,九月,十, 十一月,十二月]" change="toTimeChange()" yearNavigationEnabled="true"
+						  todayColor="red"/>
+			<mx:Label text="到"/>
+			<mx:DateField id="toTime" formatString="YYYY-MM-DD" dayNames="[日,一,二,三,四,五,六]" monthNames="[一月,二月,三月,四月,五月,六月,七月,八月,九月,十, 十一月,十二月]" change="toTimeChange()" yearNavigationEnabled="true"
+						  todayColor="red"/>
+			<mx:Button label="查　询" click="search()" icon="@Embed(source='../images/search.png')"/>
+			<mx:Button label="返回列表" click="_callBack()" icon="@Embed(source='../images/main_menu_icon.png')"/>
+		</mx:HBox>
+		<lml:CommonGrid width="100%" height="100%" dataProvider="{_list}" id="dg">
+			<lml:columns>
+				<mx:Array>
+					<mx:DataGridColumn textAlign="center" headerText="用户学号" dataField="readerid"/>
+					<mx:DataGridColumn textAlign="center" headerText="用户姓名姓名" dataField="name"/>
+					<mx:DataGridColumn textAlign="center" headerText="操作内容" dataField="detail"/>
+					<mx:DataGridColumn textAlign="center" headerText="操作时间" dataField="operateDate"/>
+				</mx:Array>
+			</lml:columns>
+		</lml:CommonGrid>
+		<lml:PageButton commHttp="{httpList}" id="paginator" itemsTotal="{_js.listCount}"/>
+	</mx:Panel>
+
+</mx:Module>

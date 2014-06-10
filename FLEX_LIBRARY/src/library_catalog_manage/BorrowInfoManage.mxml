@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" width="100%" fontSize="12" height="100%" xmlns:lml="flex.lml.Component.*">
+	<mx:Script>
+		<![CDATA[
+			import flex.lml.Connection.JsonResponseEvent;
+			import flex.lml.Component.FileDownload;
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.core.Application;
+			import flash.external.ExternalInterface;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var _js:Object;
+			[Bindable]
+			public var isSubmit:Boolean;
+
+			private function init():void
+			{
+
+				borrowInfoTab.selectedIndex == 0 ? httpLendInfoList.send() : httpHistoryInfoList.send();
+			}
+
+			private function listHandler(evt:JsonResponseEvent):void
+			{
+				_js=evt.JsonObj;
+				_list=new ArrayCollection((evt.JsonObj.data) as Array);
+			}
+
+
+
+			private function rowNum(item:Object, column:int):String
+			{
+				var index:int=this.dg.dataProvider.getItemIndex(item) + 1;
+				return String(index);
+			}
+
+			private function onDoubleClick():void
+			{
+				var win:BookListManageWin=new BookListManageWin();
+				var app:*=Application.application;
+				win.obj=dg.selectedItem;
+				win.title="查看图书信息";
+				win.callBackFun=init;
+				PopUpManager.addPopUp(win, app, true);
+				PopUpManager.centerPopUp(win);
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService id="httpLendInfoList" onJsonResponse="listHandler(event)" action="CatalogManage/CatalogManageAction!getBorrowInfo"/>
+	<lml:CommonHttpService id="httpHistoryInfoList" onJsonResponse="listHandler(event)" action="CatalogManage/CatalogManageAction!getHistoryBorrowInfo"/>
+	<mx:Panel width="100%" height="100%" layout="vertical" title="借阅信息" titleIcon="@Embed(source='images/book_edit.png')">
+		<mx:TabNavigator width="100%" height="100%" id="borrowInfoTab" change="init()">
+			<mx:Canvas label="当前借阅" width="100%" height="100%">
+				<mx:VBox height="100%" width="100%">
+					<lml:CommonGrid id="dg" width="100%" textAlign="center" height="100%" dataProvider="{_list}">
+						<lml:columns>
+							<mx:Array>
+								<mx:DataGridColumn headerText="序号" width="40" labelFunction="rowNum"/>
+								<mx:DataGridColumn headerText="书名" dataField="bookData_name"/>
+								<mx:DataGridColumn headerText="作者" dataField="bookData_authors"/>
+								<mx:DataGridColumn headerText="出版发行" dataField="bookData_publisher"/>
+								<mx:DataGridColumn headerText="馆藏地点" dataField="bookLocation_ZD_location"/>
+								<mx:DataGridColumn headerText="馆藏具体地点" dataField="bookLocation_ZD_locationName"/>
+								<mx:DataGridColumn headerText="借阅时间" dataField="borrowdate"/>
+								<mx:DataGridColumn headerText="应还时间" dataField="duedate"/>
+							</mx:Array>
+						</lml:columns>
+					</lml:CommonGrid>
+					<lml:PageButton commHttp="{httpLendInfoList}" id="paginator" itemsTotal="{_js.listCount}"/>
+				</mx:VBox>
+			</mx:Canvas>
+			<mx:Canvas label="历史借阅" width="100%" textAlign="center" height="100%">
+				<mx:VBox height="100%" width="100%">
+					<lml:CommonGrid id="dg1" width="100%" height="100%" dataProvider="{_list}">
+						<lml:columns>
+							<mx:Array>
+								<mx:DataGridColumn headerText="序号" width="40" labelFunction="rowNum"/>
+								<mx:DataGridColumn headerText="书名" dataField="bookData_name"/>
+								<mx:DataGridColumn headerText="作者" dataField="bookData_authors"/>
+								<mx:DataGridColumn headerText="出版发行" dataField="bookData_publisher"/>
+								<mx:DataGridColumn headerText="借阅日期" dataField="borrowdate"/>
+								<mx:DataGridColumn headerText="归还日期" dataField="returndate"/>
+								<mx:DataGridColumn headerText="超期天数" dataField="overduedays"/>
+								<mx:DataGridColumn headerText="罚款金额" dataField="fine"/>
+							</mx:Array>
+						</lml:columns>
+					</lml:CommonGrid>
+					<lml:PageButton commHttp="{httpLendInfoList}" id="paginator1" itemsTotal="{_js.listCount}"/>
+				</mx:VBox>
+			</mx:Canvas>
+		</mx:TabNavigator>
+	</mx:Panel>
+</mx:Module>

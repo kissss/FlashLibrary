@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" horizontalAlign="center" paddingBottom="0" paddingLeft="0" paddingRight="0" verticalAlign="bottom" paddingTop="0"
+				fontSize="12" xmlns:lml="flex.lml.Component.*" xmlns:events="flash.events.*" xmlns:lml1="http://www.lmllml.net">
+	<mx:Style source="css/Main.css"/>
+	<mx:Resize id="resize" easingFunction="{Bounce.easeOut}"/>
+	<mx:states>
+		<mx:State name="index">
+			<mx:SetProperty target="{appBar}" name="visible" value="true"/>
+			<mx:SetProperty target="{appBar}" name="includeInLayout" value="true"/>
+			<!--<mx:SetProperty target="{loginButton}" name="label" value="退出系统"/>
+			<mx:RemoveChild target="{loginBox}"/>-->
+			<mx:RemoveChild target="{loginCanvas}"/>
+			<mx:AddChild>
+				<mx:VBox x="0" y="0" height="100%" width="100%">
+					<mx:HDividedBox dividerSkin="{DividerBox}" width="100%" height="100%" paddingTop="7" horizontalGap="6">
+						<mx:Accordion width="200" height="100%" id="ac">
+							<mx:Repeater id="rpRoot" dataProvider="{_menuData}">
+								<mx:VBox label="{rpRoot.currentItem.caption}" width="100%" height="100%" paddingLeft="17" paddingTop="10">
+									<mx:Repeater id="rpSub" dataProvider="{rpRoot.currentItem.subMenuList}">
+										<mx:LinkButton icon="@Embed(source='Images/image_add.png')" label="{rpSub.currentItem.caption}" click="loadModule(event.currentTarget.getRepeaterItem().url)"/>
+									</mx:Repeater>
+								</mx:VBox>
+							</mx:Repeater>
+							<!--
+						<mx:VBox label="文件管理" width="100%" height="100%" paddingLeft="17" paddingTop="10" icon="@Embed(source='Images/contractManage.png')">
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="图书管理" click="loadModule('library_file_manage/BookManage')"/>
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="读者信息管理" click="loadModule('library_file_manage/ReaderManage')"/>
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="管理员信息管理" click="loadModule('library_file_manage/AdminManage')"/>
+						</mx:VBox>
+						<mx:VBox label="馆藏检索" width="100%" height="100%" paddingLeft="17" paddingTop="10" icon="@Embed(source='Images/contractManage.png')">
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="书目检索" click="loadModule('library_catalog_manage/BookListManage')"/>
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="查询读者借阅信息" click="loadModule('library_catalog_manage/BorrowInfoManage')"/>
+						</mx:VBox>
+						<mx:VBox label="借书还书" width="100%" height="100%" paddingLeft="17" paddingTop="10" icon="@Embed(source='Images/contractManage.png')">
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="图书归还" click="loadModule('library_borrowing_manage/BookReturnManage')"/>
+						</mx:VBox>
+						<mx:VBox label="系统维护" width="100%" height="100%" paddingLeft="17" paddingTop="10" icon="@Embed(source='Images/contractManage.png')">
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="读者类型" click="loadModule('library_system_manage/ReaderTypeManage')"/>
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="馆藏地点" click="loadModule('library_system_manage/BookLocationManage')"/>
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="系统参数" click="loadModule('library_system_manage/SystemParameterManage')"/>
+						</mx:VBox>
+						<mx:VBox label="日志管理" width="100%" height="100%" paddingLeft="17" paddingTop="10" icon="@Embed(source='Images/contractManage.png')">
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="用户操作日志" click="loadModule('library_log_manage/OperateLogManage')"/>
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="用户登录日志" click="loadModule('library_log_manage/LoginLogManage')"/>
+						</mx:VBox>
+						<mx:VBox label="帮助" width="100%" height="100%" paddingLeft="17" paddingTop="10" icon="@Embed(source='Images/contractManage.png')">
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="部门管理" click="loadModule('caiwu_sys_manage/HRDepartmentManage')"/>
+							<mx:LinkButton icon="@Embed(source='Images/contractTitle.png')" styleName="linkbotton" label="税表管理" click="loadModule('caiwu_sys_manage/TaxTableManage')"/>
+						</mx:VBox>
+						-->
+						</mx:Accordion>
+						<mx:ModuleLoader y="106" height="100%" width="100%" id="ml" url="portal.swf"/>
+					</mx:HDividedBox>
+					<mx:HBox width="100%" height="19" paddingLeft="0" paddingBottom="0" paddingRight="0" paddingTop="0">
+						<mx:ApplicationControlBar width="100%" height="100%"/>
+					</mx:HBox>
+				</mx:VBox>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{appBar}" position="lastChild">
+				<mx:HBox width="100%" height="100%">
+					<mx:Image height="84" width="357" source="images/banny.png" scaleContent="true" autoLoad="true"/>
+					<mx:VBox width="100%" height="100%">
+						<mx:HBox width="100%" height="20" horizontalAlign="right">
+							<mx:LinkButton id="loginButton" label="当前用户:{_xm}" icon="@Embed(source='Images/user_red.png')"/>
+							<mx:LinkButton id="loginButton0" label="返回主页" icon="@Embed(source='Images/house_link.png')" click="home()"/>
+							<mx:LinkButton label="修改密码" icon="@Embed(source='Images/cog_edit.png')" click="loadModule('jiaowu_global/PassWord')"/>
+						</mx:HBox>
+						<mx:HBox width="100%" height="100%" horizontalAlign="right" verticalAlign="bottom"/>
+						<mx:HBox width="100%" height="100%" horizontalAlign="right" verticalAlign="bottom">
+							<mx:Image source="images/skin.png" click="theme()"/>
+							<mx:Image source="images/up.png" click="upDown(event)"/>
+						</mx:HBox>
+					</mx:VBox>
+				</mx:HBox>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+	<mx:Script>
+		<![CDATA[
+			import flex.lml.utils.ValidateUtil;
+			import mx.modules.Module;
+			import mx.controls.Alert;
+			import flex.lml.Login.*;
+			import flex.lml.Login.LoginEvent;
+			import flex.lml.Connection.*;
+			import mx.effects.easing.Bounce;
+			import css.DividerBox;
+			import mx.managers.PopUpManager;
+
+			[Bindable]
+			private var _menuData:Object;
+			[Bindable]
+			private var _xm:String="未登录";
+			//banner收放
+			private var isOpen:Boolean=true;
+
+			private function home():void
+			{
+				var ss:Module=new Module;
+				ml.url='';
+				ml.loadModule();
+				loadModule('portal')
+			}
+
+			private function loadModule(modle_name:String):void
+			{
+				ml.url=modle_name + '.swf';
+				ml.loadModule();
+			}
+
+			private function login():void
+			{
+				if (_username.text != "" && _pwd.text != "")
+				{
+					if (loginType.selectedItem.key == '0')
+					{
+						httpLogin.send({"reader.readerid": _username.text, "reader.passwd": _pwd.text});
+					}
+					else
+					{
+						httpLoginLibrary.send({"librarian.username": _username.text, "librarian.pwd": _pwd.text});
+					}
+				}
+				else
+				{
+					loginMsg.text="用户名或密码为空";
+				}
+			}
+
+			private function loginHandle(evt:JsonResponseEvent):void
+			{
+				if (evt.JsonObj.success)
+				{
+					_menuData=evt.JsonObj.obj.libMenu;
+					this._xm=evt.JsonObj.obj.xm;
+					this.currentState="index";
+				}
+				else
+				{
+					loginMsg.text=evt.JsonObj.msg;
+				}
+
+			}
+
+			private function upDown(event:Event):void
+			{
+				if (isOpen)
+				{
+					resize.heightFrom=107;
+					resize.widthFrom=this.width;
+					resize.widthTo=this.width;
+					resize.heightTo=20;
+					resize.play();
+					event.currentTarget.source="images/down.png";
+					isOpen=false;
+				}
+				else
+				{
+					resize.heightFrom=0;
+					resize.heightTo=107;
+					resize.widthFrom=this.width;
+					resize.widthTo=this.width;
+					resize.play();
+					event.currentTarget.source="images/up.png";
+					isOpen=true;
+				}
+			}
+
+//回车键
+			private function sendKeyHandler(evt:KeyboardEvent):void
+			{
+				//Enter 键
+				if (evt.keyCode == 13)
+				{
+					login();
+					return;
+				}
+			}
+
+			//更好主题
+			private function theme():void
+			{
+				var win:ThemeWin=new ThemeWin();
+				PopUpManager.addPopUp(win, this, true);
+				PopUpManager.centerPopUp(win);
+			}
+		]]>
+	</mx:Script>
+	<!--<lml:CommonHttpService id="httpLoginMenu" onJsonResponse="MenuHandle(event)" action="FileManager/FileManagerAction!getLibrarianMenu"/>-->
+	<lml:CommonHttpService id="httpLogin" onJsonResponse="loginHandle(event)" action="FileManager/FileManagerAction!loginReader"/>
+	<lml:CommonHttpService id="httpLoginLibrary" onJsonResponse="loginHandle(event)" action="FileManager/FileManagerAction!loginLibrarian"/>
+
+	<!--<mx:VBox x="0" y="0" height="100%" width="100%" horizontalAlign="center" verticalAlign="middle" id="loginBox">
+		<lml:Login width="1000" height="672" onLoginValidated="LoginValidatedHandle(event)" clienttype="caiwu_ffb" ApplicationName="财务造表系统"/>
+	</mx:VBox>-->
+
+	<mx:ApplicationControlBar id="appBar" visible="false" includeInLayout="false" dock="true" height="107" width="100%" verticalAlign="bottom" horizontalAlign="right"/>
+
+
+
+	<mx:Canvas width="100%" height="100%" id="loginCanvas" backgroundImage="@Embed('/images/login.jpg')" backgroundAlpha="100">
+		<mx:Form id="indexLoginform" width="404" height="152" x="711" y="445">
+			<mx:HBox width="100%">
+				<mx:FormItem label="登录类型" labelWidth="70" width="251">
+					<mx:ComboBox id="loginType">
+						<mx:dataProvider>
+							<mx:Array>
+								<mx:Object label="普通用户" key="0"/>
+								<mx:Object label="系统管理员" key="1"/>
+							</mx:Array>
+						</mx:dataProvider>
+					</mx:ComboBox>
+				</mx:FormItem>
+			</mx:HBox>
+			<mx:HBox>
+				<mx:FormItem label="用户名:" required="true" labelWidth="70" width="251" keyDown="sendKeyHandler(event)">
+					<mx:TextInput id="_username"/>
+				</mx:FormItem>
+			</mx:HBox>
+			<mx:HBox>
+				<mx:FormItem label="密码:" required="true" labelWidth="70" width="251" keyDown="sendKeyHandler(event)">
+					<mx:TextInput id="_pwd" displayAsPassword="true"/>
+				</mx:FormItem>
+			</mx:HBox>
+			<mx:HBox width="100%" horizontalAlign="center">
+				<mx:Button label="登录" click="login()"/>
+				<mx:Button label="取消"/>
+			</mx:HBox>
+		</mx:Form>
+		<mx:HBox width="310" horizontalAlign="center" x="758" y="427">
+			<mx:Label id="loginMsg" text="" color="red"/>
+		</mx:HBox>
+	</mx:Canvas>
+
+
+</mx:Application>

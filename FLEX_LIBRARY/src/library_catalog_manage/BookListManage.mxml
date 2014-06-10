@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" width="100%" fontSize="12" height="100%" xmlns:lml="flex.lml.Component.*">
+	<mx:Script>
+		<![CDATA[
+			import flex.lml.Connection.JsonResponseEvent;
+			import flex.lml.Component.FileDownload;
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.core.Application;
+			import flash.external.ExternalInterface;
+
+			[Bindable]
+			private var _list:ArrayCollection;
+			[Bindable]
+			private var _js:Object;
+			[Bindable]
+			public var isSubmit:Boolean;
+
+			private function init():void
+			{
+				httpCatalogList.send();
+			}
+
+			private function listHandler(evt:JsonResponseEvent):void
+			{
+				_js=evt.JsonObj;
+				_list=new ArrayCollection((evt.JsonObj.data) as Array);
+			}
+
+			/**搜索*/
+			private function search():void
+			{
+				var param:Object=new Object;
+				param["pageJson.searchKey"]=searchKey.selectedItem.key;
+				param["pageJson.searchValue"]=searchValue.text;
+				param["pageJson.start"]=0
+				httpCatalogList.send(param);
+			}
+
+
+			private function rowNum(item:Object, column:int):String
+			{
+				var index:int=this.dg.dataProvider.getItemIndex(item) + 1;
+				return String(index);
+			}
+
+			private function onDoubleClick():void
+			{
+				var win:BookListManageWin=new BookListManageWin();
+				var app:*=Application.application;
+				win.obj=dg.selectedItem;
+				win.title="查看图书信息";
+				win.callBackFun=init;
+				PopUpManager.addPopUp(win, app, true);
+				PopUpManager.centerPopUp(win);
+			}
+		]]>
+	</mx:Script>
+	<lml:CommonHttpService onJsonResponse="listHandler(event)" id="httpCatalogList" action="FileManager/FileManagerAction!getBooksList"/>
+	<!--	<lml:CommonHttpService onJsonResponse="listHandler(event)" id="httpCatalogList" action="CatalogManage/CatalogManageAction!getCatalogList"/>-->
+	<mx:Panel width="100%" height="100%" layout="vertical" title="书目检索" titleIcon="@Embed(source='images/book_edit.png')">
+		<mx:VBox label="发放表" width="100%" height="100%">
+			<mx:HBox width="100%" height="40" verticalAlign="middle" horizontalAlign="center">
+				<mx:Label text="检索方式"/>
+				<mx:ComboBox id="searchKey">
+					<mx:dataProvider>
+						<mx:Array>
+							<mx:Object label="书名" key="name"/>
+							<mx:Object label="ISBN号" key="isbn"/>
+							<mx:Object label="作者" key="authors"/>
+							<mx:Object label="出版" key="publisher"/>
+						</mx:Array>
+					</mx:dataProvider>
+				</mx:ComboBox>
+				<mx:TextInput id="searchValue"/>
+				<mx:Button label="搜　索" styleName="search" click="search()"/>
+			</mx:HBox>
+
+			<mx:HBox width="100%" height="100%">
+				<mx:VBox height="100%" width="100%">
+					<mx:DataGrid id="dg" width="100%" height="100%" doubleClick="onDoubleClick()" doubleClickEnabled="true" textAlign="center" dataProvider="{_list}">
+						<mx:columns>
+							<mx:Array>
+								<mx:DataGridColumn headerText="序号" width="40" labelFunction="rowNum"/>
+								<mx:DataGridColumn headerText="书名" dataField="name"/>
+								<mx:DataGridColumn headerText="ISBN号" dataField="isbn"/>
+								<mx:DataGridColumn headerText="作者" dataField="authors"/>
+								<mx:DataGridColumn headerText="丛书名" dataField="series"/>
+								<mx:DataGridColumn headerText="发版书行" dataField="publisher"/>
+								<mx:DataGridColumn headerText="图书分类" dataField="classifyNo"/>
+							</mx:Array>
+						</mx:columns>
+					</mx:DataGrid>
+					<lml:PageButton commHttp="{httpCatalogList}" id="paginator" itemsTotal="{_js.listCount}"/>
+				</mx:VBox>
+			</mx:HBox>
+		</mx:VBox>
+	</mx:Panel>
+</mx:Module>
